@@ -1,0 +1,77 @@
+service: upload-now
+
+frameworkVersion: ">=1.21.0 <2.0.0"
+
+plugins:
+  - serverless-offline
+  - serverless-plugin-typescript
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'us-east-1'}
+  timeout: 20
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - s3:PutObject
+        - s3:GetObject
+      Resource: "arn:aws:s3:::${self:custom.bucket}/*"
+    - Effect: Allow
+      Action:
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+      Resource:
+        - "Fn::GetAtt": [ Table, Arn ]
+
+custom:
+  bucket: upload-now
+  table: upload-now
+  stage: ${self:provider.stage}
+
+resources:
+  Resources:
+    Bucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.bucket}
+    Table:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.table}
+        AttributeDefinitions:
+          -
+            AttributeName: id
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: id
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+functions:
+  get:
+    handler: src/handler.get
+    description: "Upload Now Get method"
+    environment:
+      BUCKET: ${self:custom.bucket}
+    events:
+      - http:
+          path: get
+          method: get
+          cors: true
+  upload:
+    handler: src/handler.upload
+    description: "Upload Now Upload method"
+    environment:
+      BUCKET_NAME: ${self:custom.bucket}
+      TABLE_NAME: ${self:custom.table}
+      MAX_FILE_SIZE_MB: 10
+    events:
+      - http:
+          path: upload
+          method: post
+          cors: true
