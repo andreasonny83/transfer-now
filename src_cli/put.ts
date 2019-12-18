@@ -6,8 +6,8 @@ import { getType } from 'mime';
 import { API_URL, GENERIC_ERROR } from './constants';
 import { log } from './log';
 
-export const put = async (targetFileName: string, silent = false): Promise<string> => {
-  const filePath = path.resolve(targetFileName);
+export const put = async (targetFile: string, silent = false): Promise<string> => {
+  const filePath = path.resolve(targetFile);
   const extName = path.extname(filePath);
   const fileName = path.basename(filePath).replace(extName, '');
   const mimeType = getType(extName);
@@ -31,6 +31,11 @@ export const put = async (targetFileName: string, silent = false): Promise<strin
     });
   } catch (err) {
     throw Error('Connection refused by the server. Please, try again later');
+  }
+
+  if (!getUrlRes.ok) {
+    const text = await getUrlRes.text();
+    throw Error(text);
   }
 
   let payload;

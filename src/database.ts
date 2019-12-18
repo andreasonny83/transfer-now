@@ -6,6 +6,7 @@ import {
   colors,
   animals
 } from 'unique-names-generator';
+import { log } from './log';
 
 const REGION = process.env.REGION || 'us-east-1';
 
@@ -20,38 +21,65 @@ const randomNameConfig: Config = {
   style: 'lowerCase'
 };
 
-/* eslint-disable no-console */
 export const generateUniqueName = async (tableName: string): Promise<string> => {
   const docClient = new AWS.DynamoDB.DocumentClient();
 
   const randomName = (fileName: string, iteration = 1): Promise<string> => {
     if (iteration > 3) {
-      throw Error('Cannot find an available name');
+      throw Error('Cannot find an available name.');
     }
 
     const params = {
       TableName: tableName,
-      Key: {
-        id: fileName
+      KeyConditionExpression: '#id = :id',
+      ExpressionAttributeNames: {
+        '#id': 'id'
+      },
+      ExpressionAttributeValues: {
+        ':id': fileName
       }
     };
 
-    const res = docClient.get(params, err => {
-      if (err) {
-        console.error(`Unable to find item. Error JSON:`, JSON.stringify(err, null, 2));
-      }
-    });
+    return docClient
+      .query(params)
+      .promise()
+      .then(data => {
+        log(`Looking for unique name ${fileName}. Response`, data);
+        if (data && data.Count && data.Count > 0) {
+          log(`Unique name: "${fileName}: already exists. Generating a new one...`);
+          const newFileName = uniqueNamesGenerator(randomNameConfig);
+          return randomName(newFileName, iteration + 1);
+        }
 
-    return res.promise().then(data => {
-      if (data && data.Item && data.Item) {
-        console.error(`Unique name: "${fileName}: already exists. Generating a new one`);
-        const newFileName = uniqueNamesGenerator(randomNameConfig);
-        return randomName(newFileName, iteration + 1);
-      }
-
-      return fileName;
-    });
+        return fileName;
+      });
   };
 
   return randomName(uniqueNamesGenerator(randomNameConfig));
+};
+
+export const storeMeta = async (
+  tableName: string,
+  name: string,
+  originalFileName: string,
+  fileExtension: string,
+  mimeType: string
+): Promise<any> => {
+  const docClient = new AWS.DynamoDB.DocumentClient();
+  const requestTime = Date.now();
+  const params = {
+    TableName: tableName,
+    Item: {
+      id: name,
+      timestamp: requestTime,
+      data: {
+        originalFileName,
+        fileExtension,
+        mimeType
+      }
+    },
+    ConditionExpression: 'attribute_not_exists(id)'
+  };
+
+  return docClient.put(params).promise();
 };

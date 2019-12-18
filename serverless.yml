@@ -20,12 +20,13 @@ provider:
       Resource: "arn:aws:s3:::${self:custom.bucket}/*"
     - Effect: Allow
       Action:
-        - dynamodb:GetItem
+        - dynamodb:Query
         - dynamodb:PutItem
       Resource:
         - "Fn::GetAtt": [ Table, Arn ]
 
 custom:
+  debug: false
   bucket: upload-now
   table: upload-now
   stage: ${self:provider.stage}
@@ -44,10 +45,16 @@ resources:
           -
             AttributeName: id
             AttributeType: S
+          -
+            AttributeName: timestamp
+            AttributeType: N
         KeySchema:
           -
             AttributeName: id
             KeyType: HASH
+          -
+            AttributeName: timestamp
+            KeyType: RANGE
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
@@ -58,6 +65,7 @@ functions:
     description: "Upload Now Get method"
     environment:
       BUCKET: ${self:custom.bucket}
+      DEBUG: ${self:custom.debug}
     events:
       - http:
           path: get
@@ -70,6 +78,7 @@ functions:
       BUCKET_NAME: ${self:custom.bucket}
       TABLE_NAME: ${self:custom.table}
       MAX_FILE_SIZE_MB: 10
+      DEBUG: ${self:custom.debug}
     events:
       - http:
           path: upload

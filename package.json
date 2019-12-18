@@ -1,6 +1,6 @@
 {
   "name": "transfer-now",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Share your files with people using just the terminal",
   "bin": {
     "transfer-now": "bin/cli"
@@ -12,14 +12,15 @@
   ],
   "scripts": {
     "postinstall": "npm run build",
-    "prerelease": "npm run build",
+    "prepublish": "npm run build",
     "release": "np",
     "sls:deploy": "serverless --stage=prod deploy",
     "sls:info": "serverless --stage=prod info",
     "sls:remove": "serverless --stage=prod remove",
     "sls:start": "sls offline --verbose --printOutput",
     "build": "rm -rf lib && tsc -p tsconfig.cli.json",
-    "cli": "npm run build && node ./bin/cli -- "
+    "cli": "npm run build && API_URL=http://localhost:3000 node ./bin/cli -- ",
+    "cli:prod": "npm run build && node ./bin/cli -- "
   },
   "dependencies": {
     "aws-sdk": "^2.590.0",
