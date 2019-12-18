@@ -30,6 +30,7 @@ custom:
   bucket: upload-now
   table: upload-now
   stage: ${self:provider.stage}
+  maxFileSize: 20
 
 resources:
   Resources:
@@ -64,12 +65,13 @@ functions:
     handler: src/handler.get
     description: "Upload Now Get method"
     environment:
-      BUCKET: ${self:custom.bucket}
+      BUCKET_NAME: ${self:custom.bucket}
+      TABLE_NAME: ${self:custom.table}
       DEBUG: ${self:custom.debug}
     events:
       - http:
           path: get
-          method: get
+          method: post
           cors: true
   upload:
     handler: src/handler.upload
@@ -77,7 +79,7 @@ functions:
     environment:
       BUCKET_NAME: ${self:custom.bucket}
       TABLE_NAME: ${self:custom.table}
-      MAX_FILE_SIZE_MB: 10
+      MAX_FILE_SIZE_MB: ${self:custom.maxFileSize}
       DEBUG: ${self:custom.debug}
     events:
       - http:

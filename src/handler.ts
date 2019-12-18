@@ -1,5 +1,5 @@
-import { generateUniqueName, storeMeta } from './database';
-import { generatePresignedUrl } from './bucket';
+import { generateUniqueName, storeMeta, getMeta } from './database';
+import { generatePresignedUrl, getFileUrl } from './bucket';
 import { log } from './log';
 
 const BUCKET_NAME = process.env.BUCKET_NAME || '';
@@ -44,6 +44,7 @@ export const upload = async (event: any, _context: any, _callback: any): Promise
   }
 
   log('ok');
+
   const info = generatePresignedUrl(BUCKET_NAME, rndName, mimeType);
 
   return {
@@ -52,8 +53,41 @@ export const upload = async (event: any, _context: any, _callback: any): Promise
   };
 };
 
-module.exports.get = (event: any, context: any, callback: any): any => {
-  callback(null, {
-    status: 'ok'
-  });
+export const get = async (event: any): Promise<any> => {
+  const { body } = event;
+  const { name } = JSON.parse(body);
+
+  log('body', body);
+
+  let fileMeta;
+  try {
+    fileMeta = await getMeta(TABLE_NAME, name);
+  } catch (err) {
+    log('Cannot read information from the database.\n', err.message || err);
+    return {
+      statusCode: 400,
+      body: `No file found matching the name "${name}".\nPlease, check the unique name then try again`
+    };
+  }
+
+  let fileUrl;
+  try {
+    fileUrl = await getFileUrl(BUCKET_NAME, name);
+  } catch (err) {
+    log(err);
+  }
+
+  log('File download url:', fileUrl);
+
+  if (!fileUrl) {
+    return {
+      statusCode: 400,
+      body: `File not found`
+    };
+  }
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify({ ...fileMeta, fileUrl })
+  };
 };

@@ -83,3 +83,32 @@ export const storeMeta = async (
 
   return docClient.put(params).promise();
 };
+
+export const getMeta = async (tableName: string, name: string): Promise<any> => {
+  const docClient = new AWS.DynamoDB.DocumentClient();
+  const params = {
+    TableName: tableName,
+    KeyConditionExpression: '#id = :id',
+    ExpressionAttributeNames: {
+      '#id': 'id'
+    },
+    ExpressionAttributeValues: {
+      ':id': name
+    }
+  };
+
+  return docClient
+    .query(params)
+    .promise()
+    .then(data => {
+      log(`Looking for unique name ${name}.`);
+      log(data);
+      if (data && data.Count && data.Count > 0 && data.Items && data.Items.length) {
+        log('Data found');
+        log(data.Items[0]);
+        return data.Items[0];
+      }
+
+      throw Error('No file found');
+    });
+};

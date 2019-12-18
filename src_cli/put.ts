@@ -3,8 +3,8 @@ import path from 'path';
 import fetch from 'node-fetch';
 import FormData from 'form-data';
 import { getType } from 'mime';
+import ora from 'ora';
 import { API_URL, GENERIC_ERROR } from './constants';
-import { log } from './log';
 
 export const put = async (targetFile: string, silent = false): Promise<string> => {
   const filePath = path.resolve(targetFile);
@@ -16,6 +16,11 @@ export const put = async (targetFile: string, silent = false): Promise<string> =
     throw Error(
       'The provided file is not supported. A file must have a name and a valid extension'
     );
+  }
+
+  const spinner = ora('Contacting the server...');
+  if (!silent) {
+    spinner.start();
   }
 
   let getUrlRes;
@@ -30,11 +35,13 @@ export const put = async (targetFile: string, silent = false): Promise<string> =
       })
     });
   } catch (err) {
+    spinner.stop();
     throw Error('Connection refused by the server. Please, try again later');
   }
 
   if (!getUrlRes.ok) {
     const text = await getUrlRes.text();
+    spinner.stop();
     throw Error(text);
   }
 
@@ -42,10 +49,12 @@ export const put = async (targetFile: string, silent = false): Promise<string> =
   try {
     payload = await getUrlRes.json();
   } catch (err) {
+    spinner.stop();
     throw Error('Cannot reach the service. Please try again later');
   }
 
   if (!payload || !payload.fields) {
+    spinner.stop();
     throw Error(GENERIC_ERROR);
   }
 
@@ -54,6 +63,7 @@ export const put = async (targetFile: string, silent = false): Promise<string> =
   const form = new FormData();
 
   if (!maxFileSize || !fileEndpoint) {
+    spinner.stop();
     throw Error(GENERIC_ERROR);
   }
 
@@ -62,6 +72,8 @@ export const put = async (targetFile: string, silent = false): Promise<string> =
   }
 
   form.append('file', fs.createReadStream(filePath));
+
+  spinner.text = 'Server ready. Uploading the file...';
 
   let length: number;
   try {
@@ -74,18 +86,18 @@ export const put = async (targetFile: string, silent = false): Promise<string> =
       });
     });
   } catch (err) {
+    spinner.stop();
     throw Error(err.message || GENERIC_ERROR);
   }
 
   if (length >= maxFileSize) {
+    spinner.stop();
     throw Error(
       `File too big!\nThe maximum allowed file size is ${maxFileSize /
         1000 /
         1000} Mb\nYour file is ${Math.floor(length / 1000 / 1000)} Mb`
     );
   }
-
-  log(silent, 'Uploading...');
 
   let response;
   try {
@@ -97,12 +109,15 @@ export const put = async (targetFile: string, silent = false): Promise<string> =
       }
     });
   } catch (err) {
+    spinner.stop();
     throw Error(err.message || GENERIC_ERROR);
   }
 
   if (!response || !response.ok || response.status >= 300) {
+    spinner.stop();
     throw Error('Cannot upload the file. Please, try again later.');
   }
 
+  spinner.stop();
   return fileEndpoint;
 };

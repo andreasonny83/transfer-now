@@ -19,8 +19,8 @@
     "sls:remove": "serverless --stage=prod remove",
     "sls:start": "sls offline --verbose --printOutput",
     "build": "rm -rf lib && tsc -p tsconfig.cli.json",
-    "cli": "npm run build && API_URL=http://localhost:3000 node ./bin/cli -- ",
-    "cli:prod": "npm run build && node ./bin/cli -- "
+    "cli": "npm run build && API_URL=http://localhost:3000 node ./bin/cli",
+    "cli:prod": "npm run build && node ./bin/cli"
   },
   "dependencies": {
     "aws-sdk": "^2.590.0",
@@ -28,6 +28,7 @@
     "meow": "^6.0.0",
     "mime": "^2.4.4",
     "node-fetch": "^2.6.0",
+    "ora": "^4.0.3",
     "unique-names-generator": "^4.1.1"
   },
   "devDependencies": {

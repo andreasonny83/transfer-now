@@ -7,15 +7,17 @@ const { transfer } = require('../lib/transfer');
 const cli = meow(
   `
   Usage
-    $ transfer put <input>
-    $ transfer get <file_short_name>
+    $ transfer-now put <input>
+    $ transfer-now get <file_short_name>
 
   Options
-    --silent, -s  Don't produce any output
+    --targetDir, -t   The directory where you want to save the file (only available when using 'transfer-now get')
+    --silent, -s      Don't produce any output
 
   Examples
-    $ transfer put ./README.md
-    $ transfer get daily_tomato_orangutan --silent
+    $ transfer-now put ./README.md
+    $ transfer-now put ./README.md --silent
+    $ transfer-now get daily_tomato_orangutan -t ./tmp
 `,
   {
     flags: {
@@ -30,6 +32,10 @@ const cli = meow(
       version: {
         type: 'boolean',
         alias: 'v'
+      },
+      targetDir: {
+        type: 'string',
+        alias: 't'
       }
     }
   }

@@ -23,3 +23,13 @@ export const generatePresignedUrl = (
 
   return res;
 };
+
+export const getFileUrl = (bucketName: string, key: string): string => {
+  const s3 = new AWS.S3();
+
+  return s3.getSignedUrl('getObject', {
+    Bucket: bucketName,
+    Key: key,
+    Expires: 30
+  });
+};

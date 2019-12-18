@@ -1,5 +1,7 @@
 import { put } from './put';
 import { log } from './log';
+import { get } from './get';
+import { GENERIC_ERROR } from './constants';
 
 enum ACTION {
   PUT = 'put',
@@ -10,6 +12,7 @@ enum ACTION {
 
 type Flags = {
   silent?: boolean;
+  targetDir?: string;
 };
 
 export const transfer = async (
@@ -17,7 +20,7 @@ export const transfer = async (
   name: string,
   flags: Flags
 ): Promise<void> => {
-  const { silent } = flags;
+  const { silent, targetDir } = flags;
 
   if (action === ACTION.PUT) {
     let fileEndpoint;
@@ -39,7 +42,19 @@ export const transfer = async (
   }
 
   if (action === ACTION.GET) {
-    log(silent, 'Method not yet available. Try again in the future');
+    let filePath: string;
+    try {
+      filePath = await get(name, targetDir);
+    } catch (err) {
+      log(silent, (err && err.message) || GENERIC_ERROR);
+      process.exit(1);
+    }
+
+    if (!filePath) {
+      log(silent, GENERIC_ERROR);
+    }
+
+    log(silent, `File saved to ${filePath}`);
     return process.exit(0);
   }
 

@@ -52,14 +52,14 @@ This will run a local version of the Serveless functions present under the `src`
 ### Run the CLI
 
 ```sh
-$ npm run cli {method} {name}
+$ npm run cli -- {method} {name}
 ```
 
 **eg.**
 
 ```sh
-$ npm run cli put ./README.md
-$ npm run cli get evil_pink_panther
+$ npm run cli -- put ./README.md
+$ npm run cli -- get evil_pink_panther
 ```
 
 This will [run the cli against your local serverless functions](#run-the-functions).
@@ -70,12 +70,12 @@ Please, make sure you're running them locally first, otherwise, [run the CLI aga
 This will run your local CLI against the production Serverless functions
 
 ```sh
-$ npm run cli:prod {method} {name}
+$ npm run cli:prod -- {method} {name}
 ```
 
 **eg.**
 
 ```sh
-$ npm run cli:prod put ./README.md
-$ npm run cli:prod get evil_pink_panther
+$ npm run cli:prod -- put ./README.md
+$ npm run cli:prod -- get evil_pink_panther
 ```
