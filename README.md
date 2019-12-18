@@ -27,3 +27,18 @@ $ yarn global add transfer-now
 ```sh
 $ npx transfer-now
 ```
+
+## Local development
+
+### Run the CLI
+
+```sh
+$ npm run cli {method} {name}
+```
+
+**eg.**
+
+```sh
+$ npm run cli put ./README.md
+$ npm run cli get evil_pink_panther
+```

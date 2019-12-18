@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "module": "CommonJS",
+    "strict": true,
+    "baseUrl": "./src_cli",
+    "esModuleInterop": true,
+    "target": "es5",
+    "outDir": "lib",
+    "moduleResolution": "Node",
+    "removeComments": true,
+    "lib": ["es2015"],
+    "rootDir": "./src_cli",
+    "pretty": false
+  },
+  "include": ["src_cli"],
+  "exclude": ["node_modules", "**/*.test.ts"]
+}

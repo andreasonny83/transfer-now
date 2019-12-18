@@ -11,11 +11,15 @@
     "README.md"
   ],
   "scripts": {
+    "postinstall": "npm run build",
+    "prerelease": "npm run build",
     "release": "np",
     "sls:deploy": "serverless --stage=prod deploy",
     "sls:info": "serverless --stage=prod info",
     "sls:remove": "serverless --stage=prod remove",
-    "start": "sls offline --verbose --printOutput"
+    "sls:start": "sls offline --verbose --printOutput",
+    "build": "rm -rf lib && tsc -p tsconfig.cli.json",
+    "cli": "npm run build && node ./bin/cli -- "
   },
   "dependencies": {
     "aws-sdk": "^2.590.0",
@@ -27,6 +31,7 @@
   },
   "devDependencies": {
     "@types/form-data": "^2.5.0",
+    "@types/mime": "^2.0.1",
     "@types/node": "^12.12.17",
     "@types/node-fetch": "^2.5.4",
     "@typescript-eslint/eslint-plugin": "^2.11.0",
@@ -35,6 +40,7 @@
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-config-prettier": "^6.7.0",
     "eslint-plugin-import": "^2.19.1",
+    "eslint-plugin-prettier": "^3.1.2",
     "np": "^5.2.1",
     "prettier": "^1.19.1",
     "serverless": "^1.59.3",

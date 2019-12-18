@@ -2,7 +2,7 @@
 'use strict';
 
 const meow = require('meow');
-const transfer = require('../lib/transfer');
+const { transfer } = require('../lib/transfer');
 
 const cli = meow(
   `
@@ -11,17 +11,17 @@ const cli = meow(
     $ transfer get <file_short_name>
 
   Options
-    --rainbow, -r  Include a rainbow
+    --silent, -s  Don't produce any output
 
   Examples
     $ transfer put ./README.md
-    $ transfer get daily_tomato_orangutan
+    $ transfer get daily_tomato_orangutan --silent
 `,
   {
     flags: {
-      rainbow: {
+      silent: {
         type: 'boolean',
-        alias: 'r'
+        alias: 's'
       },
       help: {
         type: 'boolean',
@@ -30,10 +30,6 @@ const cli = meow(
       version: {
         type: 'boolean',
         alias: 'v'
-      },
-      get: {
-        type: 'boolean',
-        alias: 'g'
       }
     }
   }

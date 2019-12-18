@@ -20,7 +20,8 @@ const randomNameConfig: Config = {
   style: 'lowerCase'
 };
 
-export const generateUniqueName = async (tableName: string) => {
+/* eslint-disable no-console */
+export const generateUniqueName = async (tableName: string): Promise<string> => {
   const docClient = new AWS.DynamoDB.DocumentClient();
 
   const randomName = (fileName: string, iteration = 1): Promise<string> => {
@@ -37,21 +38,15 @@ export const generateUniqueName = async (tableName: string) => {
 
     const res = docClient.get(params, err => {
       if (err) {
-        console.error(
-          `Unable to find item. Error JSON:`,
-          JSON.stringify(err, null, 2)
-        );
-        return;
+        console.error(`Unable to find item. Error JSON:`, JSON.stringify(err, null, 2));
       }
     });
 
     return res.promise().then(data => {
       if (data && data.Item && data.Item) {
-        console.error(
-          `Unique name: "${fileName}: already exists. Generating a new one`
-        );
+        console.error(`Unique name: "${fileName}: already exists. Generating a new one`);
         const newFileName = uniqueNamesGenerator(randomNameConfig);
-        return randomName(newFileName, ++iteration);
+        return randomName(newFileName, iteration + 1);
       }
 
       return fileName;
