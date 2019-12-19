@@ -30,22 +30,34 @@ export const upload = async (event: any, _context: any, _callback: any): Promise
     };
   }
 
-  log('random name:', rndName);
-  log('Storing information to database...');
+  log('random name for the item:', rndName);
+  log('Generating a Presigned Url...');
 
+  let info;
   try {
-    await storeMeta(TABLE_NAME, rndName, fileName, extName, mimeType);
+    info = generatePresignedUrl(BUCKET_NAME, rndName, mimeType);
   } catch (err) {
-    log('Cannot store information to the database.\n', err.message || err);
+    log(err.message || err);
     return {
       statusCode: 400,
       body: 'No files were uploaded. Please, try again later'
     };
   }
 
-  log('ok');
+  log('Presigned Url generated');
+  log('Storing information to database...');
 
-  const info = generatePresignedUrl(BUCKET_NAME, rndName, mimeType);
+  try {
+    await storeMeta(TABLE_NAME, rndName, fileName, extName, mimeType);
+  } catch (err) {
+    log(`Cannot store information to the database\n${err.message || err}`);
+    return {
+      statusCode: 400,
+      body: 'No files were uploaded. Please, try again later'
+    };
+  }
+
+  log('done');
 
   return {
     statusCode: 201,
@@ -63,10 +75,10 @@ export const get = async (event: any): Promise<any> => {
   try {
     fileMeta = await getMeta(TABLE_NAME, name);
   } catch (err) {
-    log('Cannot read information from the database.\n', err.message || err);
+    log(`Cannot read information from the database\n'${err.message || err}`);
     return {
       statusCode: 400,
-      body: `No file found matching the name "${name}".\nPlease, check the unique name then try again`
+      body: `No file found matching the name "${name}"\nPlease, check the unique name then try again`
     };
   }
 

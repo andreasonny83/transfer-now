@@ -13,9 +13,7 @@ export const put = async (targetFile: string, silent = false): Promise<string> =
   const mimeType = getType(extName);
 
   if (!mimeType || !extName || !fileName || !filePath) {
-    throw Error(
-      'The provided file is not supported. A file must have a name and a valid extension'
-    );
+    throw Error('The provided file is not supported. A file must have a name and a valid extension');
   }
 
   const spinner = ora('Contacting the server...');
@@ -93,9 +91,9 @@ export const put = async (targetFile: string, silent = false): Promise<string> =
   if (length >= maxFileSize) {
     spinner.stop();
     throw Error(
-      `File too big!\nThe maximum allowed file size is ${maxFileSize /
-        1000 /
-        1000} Mb\nYour file is ${Math.floor(length / 1000 / 1000)} Mb`
+      `File too big!\nThe maximum allowed file size is ${maxFileSize / 1000 / 1000} Mb\nYour file is ${Math.floor(
+        length / 1000 / 1000
+      )} Mb`
     );
   }
 

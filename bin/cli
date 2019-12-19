@@ -6,6 +6,8 @@ const { transfer } = require('../lib/transfer');
 
 const cli = meow(
   `
+  Note: Uploaded files will be available for 1 day only
+
   Usage
     $ transfer-now put <input>
     $ transfer-now get <file_short_name>

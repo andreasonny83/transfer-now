@@ -15,11 +15,7 @@ type Flags = {
   targetDir?: string;
 };
 
-export const transfer = async (
-  action: ACTION,
-  name: string,
-  flags: Flags
-): Promise<void> => {
+export const transfer = async (action: ACTION, name: string, flags: Flags): Promise<void> => {
   const { silent, targetDir } = flags;
 
   if (action === ACTION.PUT) {
@@ -33,10 +29,7 @@ export const transfer = async (
 
     if (!silent) {
       log(silent, `File available at: ${fileEndpoint}`);
-      log(
-        silent,
-        `You can now download from your terminal with\n\n  $ transfer-now get ${fileEndpoint}\n\n`
-      );
+      log(silent, `You can now download from your terminal with\n\n  $ transfer-now get ${fileEndpoint}\n\n`);
     }
     return process.exit(0);
   }
@@ -68,9 +61,6 @@ export const transfer = async (
     return process.exit(0);
   }
 
-  log(
-    silent,
-    `Method not allowed ${action}. Try running transfer-now --help for more information`
-  );
+  log(silent, `Method not allowed ${action}. Try running transfer-now --help for more information`);
   return process.exit(1);
 };

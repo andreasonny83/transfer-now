@@ -3,23 +3,33 @@
 > Share your files with people using just the terminal
 
 - [Transfer Now](#transfer-now)
-  - [Prerequisites](#prerequisites)
 - [Installation](#installation)
     - [Install with npm](#install-with-npm)
     - [Install with Yarn](#install-with-yarn)
-    - [Run from without installing](#run-from-without-installing)
-  - [Local development](#local-development)
-    - [Run the functions](#run-the-functions)
-    - [Run the CLI](#run-the-cli)
-    - [Run the CLI against Prod](#run-the-cli-against-prod)
-    -
-## Prerequisites
+    - [Run with npm without installing](#run-with-npm-without-installing)
+  - [Upload a file](#upload-a-file)
+  - [Download a file](#download-a-file)
 
-The CLI has dependencies that require Node 6 or higher, together with NPM 3 or higher.
+```
+Share your files with people using just the terminal
+
+Note: Uploaded files will be available for 1 day only
+
+  Usage
+    $ transfer-now put <input>
+    $ transfer-now get <file_short_name>
+
+  Options
+    --targetDir, -t   The directory where you want to save the file (only available when using 'transfer-now get')
+    --silent, -s      Don't produce any output
+
+  Examples
+    $ transfer-now put ./README.md
+    $ transfer-now put ./README.md --silent
+    $ transfer-now get daily_tomato_orangutan -t ./tmp
+```
 
 # Installation
-
-**BEFORE YOU INSTALL:** please read the [prerequisites](#prerequisites)
 
 ### Install with npm
 
@@ -33,49 +43,47 @@ $ npm install -g transfer-now
 $ yarn global add transfer-now
 ```
 
-### Run from without installing
+### Run with npm without installing
 
 ```sh
 $ npx transfer-now
 ```
 
-## Local development
-
-### Run the functions
+eg.
 
 ```sh
-$ npm run sls:start
+$ npx transfer-now put README.md
 ```
 
-This will run a local version of the Serveless functions present under the `src` folder
+## Upload a file
 
-### Run the CLI
+**Note:** Uploaded files will be available for 1 day only
 
 ```sh
-$ npm run cli -- {method} {name}
+$ transfer-now put {FILE_PATH}
 ```
 
-**eg.**
+eg.
 
 ```sh
-$ npm run cli -- put ./README.md
-$ npm run cli -- get evil_pink_panther
+$ transfer-now put grocery.txt
+$ transfer-now put ./README.md
+$ transfer-now put /User/myname/Desktop/smile.jpg
 ```
 
-This will [run the cli against your local serverless functions](#run-the-functions).
-Please, make sure you're running them locally first, otherwise, [run the CLI against the PROD environment](#run-the-cli-against-prod).
-
-### Run the CLI against Prod
-
-This will run your local CLI against the production Serverless functions
+## Download a file
 
 ```sh
-$ npm run cli:prod -- {method} {name}
+$ transfer-now get {UNIQUE_NAME}
 ```
 
-**eg.**
+eg.
 
 ```sh
-$ npm run cli:prod -- put ./README.md
-$ npm run cli:prod -- get evil_pink_panther
+$ transfer-now get skilled_scarlet_cockroach
+$ transfer-now get skilled_scarlet_cockroach -t ./tmp
+$ transfer-now get skilled_scarlet_cockroach -t /User/myname/Desktop/
 ```
+
+Use the flag `--targetDir, -t` if you want to save the file to a different location.
+
