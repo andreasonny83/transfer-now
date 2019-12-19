@@ -12,7 +12,9 @@
     - [Run the functions](#run-the-functions)
     - [Run the CLI](#run-the-cli)
     - [Run the CLI against Prod](#run-the-cli-against-prod)
-    -
+
+![](architecture.jpg)
+
 ## Prerequisites
 
 The CLI has dependencies that require Node 6 or higher, together with NPM 3 or higher.
