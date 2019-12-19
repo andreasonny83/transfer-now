@@ -11,7 +11,6 @@
     "README.md"
   ],
   "scripts": {
-    "postinstall": "npm run build",
     "prepublish": "npm run build",
     "release": "np",
     "sls:deploy": "serverless --stage=prod deploy",
@@ -29,7 +28,8 @@
     "mime": "^2.4.4",
     "node-fetch": "^2.6.0",
     "ora": "^4.0.3",
-    "unique-names-generator": "^4.1.1"
+    "unique-names-generator": "^4.1.1",
+    "update-notifier": "^4.0.0"
   },
   "devDependencies": {
     "@types/form-data": "^2.5.0",
