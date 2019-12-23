@@ -4,7 +4,7 @@ import fetch from 'node-fetch';
 import ora from 'ora';
 import { API_URL, GENERIC_ERROR } from './constants';
 
-export const get = async (name: string, targetDir = '', silent = false): Promise<string> => {
+export const get = async (name: string, targetDir = '', targetFilename = '', silent = false): Promise<string> => {
   if (!name) {
     throw Error('A unique file name must be provided');
   }
@@ -14,6 +14,11 @@ export const get = async (name: string, targetDir = '', silent = false): Promise
   }
 
   const filePath = path.resolve(targetDir);
+
+  if (!fs.existsSync(filePath)) {
+    throw Error(`${filePath} is not a valid path`);
+  }
+
   const spinner = ora('Looking for your file...');
 
   if (!silent) {
@@ -66,7 +71,14 @@ export const get = async (name: string, targetDir = '', silent = false): Promise
     throw Error('Cannot find a file to download.');
   }
 
-  const destPath = `${filePath}/${payload.data.originalFileName}${payload.data.fileExtension}`;
+  const filename = targetFilename || payload.data.originalFileName;
+
+  const destPath = `${filePath}/${filename}${payload.data.fileExtension}`;
+
+  if (fs.existsSync(destPath)) {
+    throw Error(`File ${filename} already exists in directory ${filePath}`);
+  }
+
   const dest = fs.createWriteStream(destPath);
   bucketFile.body.pipe(dest);
 
