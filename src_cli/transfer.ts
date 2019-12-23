@@ -13,10 +13,11 @@ enum ACTION {
 type Flags = {
   silent?: boolean;
   targetDir?: string;
+  targetFilename?: string;
 };
 
 export const transfer = async (action: ACTION, name: string, flags: Flags): Promise<void> => {
-  const { silent, targetDir } = flags;
+  const { silent, targetDir, targetFilename } = flags;
 
   if (action === ACTION.PUT) {
     let fileEndpoint;
@@ -37,7 +38,7 @@ export const transfer = async (action: ACTION, name: string, flags: Flags): Prom
   if (action === ACTION.GET) {
     let filePath: string;
     try {
-      filePath = await get(name, targetDir);
+      filePath = await get(name, targetDir, targetFilename);
     } catch (err) {
       log(silent, (err && err.message) || GENERIC_ERROR);
       process.exit(1);

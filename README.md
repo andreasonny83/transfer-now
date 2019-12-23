@@ -20,13 +20,15 @@ Note: Uploaded files will be available for 1 day only
     $ transfer-now get <file_short_name>
 
   Options
-    --targetDir, -t   The directory where you want to save the file (only available when using 'transfer-now get')
-    --silent, -s      Don't produce any output
+    --targetDir, -t         The directory where you want to save the file (only available when using 'transfer-now get')
+    --targetFilename, -n    The filename by which you want to save the file. Original file extension is preserved (only available when using 'transfer-now get')
+    --silent, -s            Don't produce any output
 
   Examples
     $ transfer-now put ./README.md
     $ transfer-now put ./README.md --silent
     $ transfer-now get daily_tomato_orangutan -t ./tmp
+    $ transfer-now get daily_tomato_orangutan -n tomato
 ```
 
 # Installation
@@ -83,6 +85,7 @@ eg.
 $ transfer-now get skilled_scarlet_cockroach
 $ transfer-now get skilled_scarlet_cockroach -t ./tmp
 $ transfer-now get skilled_scarlet_cockroach -t /User/myname/Desktop/
+$ transfer-now get skilled_scarlet_cockroach -n example
 ```
 
 Use the flag `--targetDir, -t` if you want to save the file to a different location.
