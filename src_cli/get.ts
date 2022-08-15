@@ -29,8 +29,7 @@ export const get = async (name: string, targetDir = '', targetFilename = '', sil
   try {
     getFileRes = await fetch(`${API_URL}/get`, {
       method: 'POST',
-      timeout: 5000,
-      body: JSON.stringify({ name })
+      body: JSON.stringify({ name }),
     });
   } catch (err) {
     spinner.clear();
@@ -43,7 +42,7 @@ export const get = async (name: string, targetDir = '', targetFilename = '', sil
     throw Error(text);
   }
 
-  let payload;
+  let payload: any;
   try {
     payload = await getFileRes.json();
   } catch (err) {
@@ -58,7 +57,7 @@ export const get = async (name: string, targetDir = '', targetFilename = '', sil
 
   spinner.text = 'File found. Starting the download...';
 
-  let bucketFile;
+  let bucketFile: any;
   try {
     bucketFile = await fetch(payload.fileUrl);
   } catch (err) {

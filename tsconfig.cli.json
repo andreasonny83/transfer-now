@@ -10,7 +10,8 @@
     "removeComments": true,
     "lib": ["es2015"],
     "rootDir": "./src_cli",
-    "pretty": false
+    "pretty": false,
+    "skipLibCheck": true
   },
   "include": ["src_cli"],
   "exclude": ["node_modules", "**/*.test.ts"]

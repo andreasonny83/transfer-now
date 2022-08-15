@@ -23,7 +23,7 @@ export const transfer = async (action: ACTION, name: string, flags: Flags): Prom
     let fileEndpoint;
     try {
       fileEndpoint = await put(name, silent);
-    } catch (err) {
+    } catch (err: any) {
       log(silent, err.message || err);
       process.exit(1);
     }
@@ -39,7 +39,7 @@ export const transfer = async (action: ACTION, name: string, flags: Flags): Prom
     let filePath: string;
     try {
       filePath = await get(name, targetDir, targetFilename);
-    } catch (err) {
+    } catch (err: any) {
       log(silent, (err && err.message) || GENERIC_ERROR);
       process.exit(1);
     }

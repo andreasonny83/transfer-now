@@ -1,29 +1,24 @@
 module.exports = {
   env: {
     es6: true,
-    node: true
+    node: true,
   },
-  extends: [
-    'prettier',
-    'plugin:@typescript-eslint/recommended',
-    'prettier/@typescript-eslint',
-    'plugin:prettier/recommended'
-  ],
+  extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended', 'prettier'],
   globals: {
     Atomics: 'readonly',
-    SharedArrayBuffer: 'readonly'
+    SharedArrayBuffer: 'readonly',
   },
   parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 2018,
-    sourceType: 'module'
+    sourceType: 'module',
   },
-  plugins: ['@typescript-eslint', 'prettier', '@typescript-eslint/eslint-plugin'],
+  plugins: ['@typescript-eslint'],
   ignorePatterns: ['bin/', 'lib/', 'old/', 'node_modules/'],
   rules: {
     'no-console': 'error',
     '@typescript-eslint/no-explicit-any': 0,
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-    '@typescript-eslint/explicit-function-return-type': 0
-  }
+    // '@typescript-eslint/explicit-function-return-type': 0,
+  },
 };

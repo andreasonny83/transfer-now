@@ -8,7 +8,7 @@ const pkg = require('../package.json');
 
 const notifier = updateNotifier({
   pkg,
-  updateCheckInterval: 1000 * 60 * 60 * 24 // 1 day
+  updateCheckInterval: 1000 * 60 * 60 * 24, // 1 day
 });
 
 notifier.notify();
@@ -36,25 +36,25 @@ const cli = meow(
     flags: {
       silent: {
         type: 'boolean',
-        alias: 's'
+        alias: 's',
       },
       help: {
         type: 'boolean',
-        alias: 'h'
+        alias: 'h',
       },
       version: {
         type: 'boolean',
-        alias: 'v'
+        alias: 'v',
       },
       targetDir: {
         type: 'string',
-        alias: 't'
+        alias: 't',
       },
       targetFilename: {
         type: 'string',
-        alias: 'n'
-      }
-    }
+        alias: 'n',
+      },
+    },
   }
 );
 

@@ -5,7 +5,7 @@ import { log } from './log';
 const BUCKET_NAME = process.env.BUCKET_NAME || '';
 const TABLE_NAME = process.env.TABLE_NAME || '';
 
-export const upload = async (event: any, _context: any, _callback: any): Promise<any> => {
+export const upload = async (event: any): Promise<any> => {
   const { body } = event;
   const { fileName, extName, mimeType } = JSON.parse(body);
 
@@ -15,18 +15,18 @@ export const upload = async (event: any, _context: any, _callback: any): Promise
     log('A filename must be provided');
     return {
       statusCode: 400,
-      body: 'A filename must be provided'
+      body: 'A filename must be provided',
     };
   }
 
   let rndName: string;
   try {
     rndName = await generateUniqueName(TABLE_NAME);
-  } catch (err) {
+  } catch (err: any) {
     log(err.message || err);
     return {
       statusCode: 400,
-      body: 'No files were uploaded. Please, try again later'
+      body: 'No files were uploaded. Please, try again later',
     };
   }
 
@@ -36,11 +36,11 @@ export const upload = async (event: any, _context: any, _callback: any): Promise
   let info;
   try {
     info = generatePresignedUrl(BUCKET_NAME, rndName, mimeType);
-  } catch (err) {
+  } catch (err: any) {
     log(err.message || err);
     return {
       statusCode: 400,
-      body: 'No files were uploaded. Please, try again later'
+      body: 'No files were uploaded. Please, try again later',
     };
   }
 
@@ -49,11 +49,11 @@ export const upload = async (event: any, _context: any, _callback: any): Promise
 
   try {
     await storeMeta(TABLE_NAME, rndName, fileName, extName, mimeType);
-  } catch (err) {
+  } catch (err: any) {
     log(`Cannot store information to the database\n${err.message || err}`);
     return {
       statusCode: 400,
-      body: 'No files were uploaded. Please, try again later'
+      body: 'No files were uploaded. Please, try again later',
     };
   }
 
@@ -61,7 +61,7 @@ export const upload = async (event: any, _context: any, _callback: any): Promise
 
   return {
     statusCode: 201,
-    body: JSON.stringify(info)
+    body: JSON.stringify(info),
   };
 };
 
@@ -74,11 +74,11 @@ export const get = async (event: any): Promise<any> => {
   let fileMeta;
   try {
     fileMeta = await getMeta(TABLE_NAME, name);
-  } catch (err) {
+  } catch (err: any) {
     log(`Cannot read information from the database\n'${err.message || err}`);
     return {
       statusCode: 400,
-      body: `No file found matching the name "${name}"\nPlease, check the unique name then try again`
+      body: `No file found matching the name "${name}"\nPlease, check the unique name then try again`,
     };
   }
 
@@ -94,12 +94,12 @@ export const get = async (event: any): Promise<any> => {
   if (!fileUrl) {
     return {
       statusCode: 400,
-      body: `File not found`
+      body: `File not found`,
     };
   }
 
   return {
     statusCode: 200,
-    body: JSON.stringify({ ...fileMeta, fileUrl })
+    body: JSON.stringify({ ...fileMeta, fileUrl }),
   };
 };

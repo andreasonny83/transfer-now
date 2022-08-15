@@ -25,12 +25,11 @@ export const put = async (targetFile: string, silent = false): Promise<string> =
   try {
     getUrlRes = await fetch(`${API_URL}/upload`, {
       method: 'POST',
-      timeout: 5000,
       body: JSON.stringify({
         fileName,
         extName,
-        mimeType
-      })
+        mimeType,
+      }),
     });
   } catch (err) {
     spinner.stop();
@@ -43,7 +42,7 @@ export const put = async (targetFile: string, silent = false): Promise<string> =
     throw Error(text);
   }
 
-  let payload;
+  let payload: any;
   try {
     payload = await getUrlRes.json();
   } catch (err) {
@@ -83,7 +82,7 @@ export const put = async (targetFile: string, silent = false): Promise<string> =
         res(data);
       });
     });
-  } catch (err) {
+  } catch (err: any) {
     spinner.stop();
     throw Error(err.message || GENERIC_ERROR);
   }
@@ -103,10 +102,10 @@ export const put = async (targetFile: string, silent = false): Promise<string> =
       method: 'POST',
       body: form,
       headers: {
-        'Content-Length': String(length)
-      }
+        'Content-Length': String(length),
+      },
     });
-  } catch (err) {
+  } catch (err: any) {
     spinner.stop();
     throw Error(err.message || GENERIC_ERROR);
   }
