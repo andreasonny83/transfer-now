@@ -1,4 +1,13 @@
-import AWS from 'aws-sdk';
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import {
+  DynamoDBDocumentClient,
+  QueryCommand,
+  QueryCommandInput,
+  QueryCommandOutput,
+  PutCommand,
+  PutCommandInput,
+  PutCommandOutput,
+} from '@aws-sdk/lib-dynamodb';
 import { Config, uniqueNamesGenerator, adjectives, colors, animals } from 'unique-names-generator';
 import { log } from './log';
 
@@ -15,35 +24,33 @@ interface ItemData {
   };
 }
 
-AWS.config.update({
-  region: REGION
-});
-
-const docClient = new AWS.DynamoDB.DocumentClient();
+const client = new DynamoDBClient({ region: REGION });
+const docClient = DynamoDBDocumentClient.from(client);
 
 const randomNameConfig: Config = {
   dictionaries: [adjectives, colors, animals],
   length: 3,
   separator: '_',
-  style: 'lowerCase'
+  style: 'lowerCase',
 };
 
-const findItem = async (tableName: string, itemId: string) => {
-  const params = {
+const findItem = async (tableName: string, itemId: string): Promise<QueryCommandOutput> => {
+  const params: QueryCommandInput = {
     TableName: tableName,
     KeyConditionExpression: '#id = :id',
     ExpressionAttributeNames: {
-      '#id': 'id'
+      '#id': 'id',
     },
     ExpressionAttributeValues: {
-      ':id': itemId
-    }
+      ':id': itemId,
+    },
   };
 
-  return docClient.query(params).promise();
+  const command = new QueryCommand(params);
+  return docClient.send(command);
 };
 
-const getDataItem = (data?: AWS.DynamoDB.DocumentClient.QueryOutput) => {
+const getDataItem = (data?: QueryCommandOutput) => {
   if (data && data.Items && data.Count && data.Count > 0 && data.Items.length && data.Items[0]) {
     return data.Items[0] as ItemData;
   }
@@ -51,7 +58,7 @@ const getDataItem = (data?: AWS.DynamoDB.DocumentClient.QueryOutput) => {
   return undefined;
 };
 
-const isDataFresh = (dataItem?: AWS.DynamoDB.DocumentClient.QueryOutput): boolean => {
+const isDataFresh = (dataItem?: QueryCommandOutput): boolean => {
   const data = getDataItem(dataItem);
 
   if (!data) {
@@ -96,11 +103,14 @@ export const storeMeta = async (
   originalFileName: string,
   fileExtension: string,
   mimeType: string
-): Promise<any> => {
-  const docClient = new AWS.DynamoDB.DocumentClient();
+): Promise<PutCommandOutput> => {
+  const client = new DynamoDBClient({ region: REGION });
+  const docClient = DynamoDBDocumentClient.from(client);
+
   const requestTime = Date.now();
   const expirationTime = Date.now() + EXPIRATION_DAYS * 24 * 60 * 60 * 1000;
-  const params = {
+
+  const params: PutCommandInput = {
     TableName: tableName,
     Item: {
       id: name,
@@ -109,12 +119,13 @@ export const storeMeta = async (
       data: {
         originalFileName,
         fileExtension,
-        mimeType
-      }
-    }
+        mimeType,
+      },
+    },
   };
 
-  return docClient.put(params).promise();
+  const command = new PutCommand(params);
+  return docClient.send(command);
 };
 
 export const getMeta = async (tableName: string, name: string) => {

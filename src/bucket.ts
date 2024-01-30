@@ -1,35 +1,40 @@
-import AWS from 'aws-sdk';
+import { S3Client, GetObjectCommand, GetObjectCommandInput } from '@aws-sdk/client-s3';
+import { createPresignedPost } from '@aws-sdk/s3-presigned-post';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 const MAX_FILE_SIZE = Number(process.env.MAX_FILE_SIZE_MB) || 10;
 
-export const generatePresignedUrl = (bucketName: string, key: string, contentType: string) => {
-  const s3 = new AWS.S3();
+export const generatePresignedUrl = async (bucketName: string, key: string, contentType: string) => {
+  const client = new S3Client();
+
   const maxFileSize = MAX_FILE_SIZE * 1000 * 1000;
 
-  const res = s3.createPresignedPost({
+  return createPresignedPost(client, {
     Bucket: bucketName,
     Expires: 10,
+    Key: key,
     Fields: {
       key,
       'Content-Type': contentType,
-      'Max-File-Size': String(maxFileSize)
+      'Max-File-Size': String(maxFileSize),
     },
     Conditions: [
       ['content-length-range', 0, maxFileSize],
       ['eq', '$Content-Type', contentType],
-      ['eq', '$key', key]
-    ]
+      ['eq', '$key', key],
+    ],
   });
-
-  return res;
 };
 
-export const getFileUrl = (bucketName: string, key: string): string => {
-  const s3 = new AWS.S3();
+export const getFileUrl = async (bucketName: string, key: string): Promise<string> => {
+  const client = new S3Client();
 
-  return s3.getSignedUrl('getObject', {
+  const getObjectParams: GetObjectCommandInput = {
     Bucket: bucketName,
     Key: key,
-    Expires: 10
-  });
+  };
+
+  const command = new GetObjectCommand(getObjectParams);
+
+  return getSignedUrl(client, command, { expiresIn: 10 });
 };

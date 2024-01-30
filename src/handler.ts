@@ -35,7 +35,7 @@ export const upload = async (event: any): Promise<any> => {
 
   let info;
   try {
-    info = generatePresignedUrl(BUCKET_NAME, rndName, mimeType);
+    info = await generatePresignedUrl(BUCKET_NAME, rndName, mimeType);
   } catch (err: any) {
     log(err.message || err);
     return {
@@ -44,7 +44,7 @@ export const upload = async (event: any): Promise<any> => {
     };
   }
 
-  log('Presigned Url generated');
+  log('Presigned Url generated', info);
   log('Storing information to database...');
 
   try {
