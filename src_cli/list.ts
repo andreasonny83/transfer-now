@@ -24,6 +24,13 @@ export const list = async (silent = false): Promise<void> => {
     throw Error('Connection refused by the server. Please, try again later');
   }
 
+  if (getListRes.status == 400) {
+    const text = await getListRes.text();
+    spinner.clear();
+    log(false, text);
+    return;
+  }
+
   if (!getListRes.ok) {
     const text = await getListRes.text();
     spinner.clear();

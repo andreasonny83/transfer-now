@@ -21,10 +21,10 @@ export const handler = async (event: any): Promise<any> => {
   try {
     userData = await getUserData(TABLE_NAME, machineId);
   } catch (err: any) {
-    log(`Cannot read information from the database\n'${err.message || err}`);
+    log(`Cannot find user matching ${machineId}.\n'${err.message || err}`);
     return {
       statusCode: 400,
-      body: `No data found matching the machineId "${machineId}"\nPlease, check the unique name then try again`,
+      body: `No files found on the server.`,
     };
   }
 
