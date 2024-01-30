@@ -20,6 +20,7 @@ const cli = meow(
   Usage
     $ transfer-now put <input>
     $ transfer-now get <file_short_name>
+    $ transfer-now list
 
   Options
     --targetDir, -t       The directory where you want to save the file (only available when using 'transfer-now get')

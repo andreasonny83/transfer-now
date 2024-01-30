@@ -1,13 +1,14 @@
 import { put } from './put';
 import { log } from './log';
 import { get } from './get';
+import { list } from './list';
 import { GENERIC_ERROR } from './constants';
 
-enum ACTION {
+const enum ACTION {
   PUT = 'put',
   GET = 'get',
   LIST = 'list',
-  LOGIN = 'login'
+  LOGIN = 'login',
 }
 
 type Flags = {
@@ -53,7 +54,7 @@ export const transfer = async (action: ACTION, name: string, flags: Flags): Prom
   }
 
   if (action === ACTION.LIST) {
-    log(silent, 'Method "get" not yet available. Try again in the future');
+    await list(silent);
     return process.exit(0);
   }
 

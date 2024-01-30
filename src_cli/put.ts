@@ -4,6 +4,7 @@ import fetch from 'node-fetch';
 import FormData from 'form-data';
 import { getType } from 'mime';
 import ora from 'ora';
+import { machineIdSync } from 'node-machine-id';
 import { API_URL, GENERIC_ERROR } from './constants';
 
 export const put = async (targetFile: string, silent = false): Promise<string> => {
@@ -11,6 +12,7 @@ export const put = async (targetFile: string, silent = false): Promise<string> =
   const extName = path.extname(filePath);
   const fileName = path.basename(filePath).replace(extName, '');
   const mimeType = getType(extName);
+  const machineId = machineIdSync();
 
   if (!mimeType || !extName || !fileName || !filePath) {
     throw Error('The provided file is not supported. A file must have a name and a valid extension');
@@ -29,6 +31,7 @@ export const put = async (targetFile: string, silent = false): Promise<string> =
         fileName,
         extName,
         mimeType,
+        machineId,
       }),
     });
   } catch (err) {

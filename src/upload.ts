@@ -1,13 +1,13 @@
-import { generateUniqueName, storeMeta, getMeta } from './database';
-import { generatePresignedUrl, getFileUrl } from './bucket';
+import { generateUniqueName, storeMeta } from './database';
+import { generatePresignedUrl } from './bucket';
 import { log } from './log';
 
 const BUCKET_NAME = process.env.BUCKET_NAME || '';
 const TABLE_NAME = process.env.TABLE_NAME || '';
 
-export const upload = async (event: any): Promise<any> => {
+export const handler = async (event: any): Promise<any> => {
   const { body } = event;
-  const { fileName, extName, mimeType } = JSON.parse(body);
+  const { fileName, extName, mimeType, machineId } = JSON.parse(body);
 
   log('body', body);
 
@@ -48,7 +48,7 @@ export const upload = async (event: any): Promise<any> => {
   log('Storing information to database...');
 
   try {
-    await storeMeta(TABLE_NAME, rndName, fileName, extName, mimeType);
+    await storeMeta(TABLE_NAME, rndName, fileName, extName, mimeType, machineId);
   } catch (err: any) {
     log(`Cannot store information to the database\n${err.message || err}`);
     return {
@@ -62,44 +62,5 @@ export const upload = async (event: any): Promise<any> => {
   return {
     statusCode: 201,
     body: JSON.stringify(info),
-  };
-};
-
-export const get = async (event: any): Promise<any> => {
-  const { body } = event;
-  const { name } = JSON.parse(body);
-
-  log('body', body);
-
-  let fileMeta;
-  try {
-    fileMeta = await getMeta(TABLE_NAME, name);
-  } catch (err: any) {
-    log(`Cannot read information from the database\n'${err.message || err}`);
-    return {
-      statusCode: 400,
-      body: `No file found matching the name "${name}"\nPlease, check the unique name then try again`,
-    };
-  }
-
-  let fileUrl;
-  try {
-    fileUrl = await getFileUrl(BUCKET_NAME, name);
-  } catch (err) {
-    log(err);
-  }
-
-  log('File download url:', fileUrl);
-
-  if (!fileUrl) {
-    return {
-      statusCode: 400,
-      body: `File not found`,
-    };
-  }
-
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ ...fileMeta, fileUrl }),
   };
 };

@@ -102,7 +102,8 @@ export const storeMeta = async (
   name: string,
   originalFileName: string,
   fileExtension: string,
-  mimeType: string
+  mimeType: string,
+  machineId: string
 ): Promise<PutCommandOutput> => {
   const client = new DynamoDBClient({ region: REGION });
   const docClient = DynamoDBDocumentClient.from(client);
@@ -116,6 +117,7 @@ export const storeMeta = async (
       id: name,
       timestamp: requestTime,
       expiration: expirationTime,
+      machineId,
       data: {
         originalFileName,
         fileExtension,
@@ -148,4 +150,33 @@ export const getMeta = async (tableName: string, name: string) => {
   }
 
   throw Error('No file found');
+};
+
+export const getUserData = async (tableName: string, machineId: string) => {
+  const params: QueryCommandInput = {
+    TableName: tableName,
+    IndexName: 'GSI1',
+    KeyConditionExpression: '#machineId = :machineId',
+    ExpressionAttributeNames: {
+      '#machineId': 'machineId',
+    },
+    ExpressionAttributeValues: {
+      ':machineId': machineId,
+    },
+  };
+
+  const command = new QueryCommand(params);
+  const data = await docClient.send(command);
+  return (
+    data &&
+    data.Items && {
+      data: data.Items.map((item: any) => {
+        return {
+          id: item.id,
+          expiration: item.expiration,
+          fileName: item.data.originalFileName + item.data.fileExtension,
+        };
+      }),
+    }
+  );
 };

@@ -1,6 +1,7 @@
 service: transfer-now
-
-frameworkVersion: "3"
+frameworkVersion: '3'
+package:
+  individually: true
 
 plugins:
   - serverless-offline
@@ -10,7 +11,6 @@ provider:
   name: aws
   runtime: nodejs18.x
   stage: ${opt:stage, 'dev'}
-  region: ${opt:region, 'us-east-1'}
   timeout: 20
   iamRoleStatements:
     - Effect: Allow
@@ -23,7 +23,7 @@ provider:
         - dynamodb:Query
         - dynamodb:PutItem
       Resource:
-        - "Fn::GetAtt": [ Table, Arn ]
+        - "Fn::GetAtt": [ TransferNowTable, Arn ]
 
 custom:
   debug: ${env:DEBUG, false}
@@ -34,29 +34,41 @@ custom:
 
 resources:
   Resources:
-    Bucket:
+    TransferNowBucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: ${self:custom.bucket}
-    Table:
+        BucketName:
+          Fn::Sub: ${self:custom.bucket}
+
+    TransferNowTable:
       Type: AWS::DynamoDB::Table
       Properties:
         TableName: ${self:custom.table}
         AttributeDefinitions:
-          -
-            AttributeName: id
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: machineId
             AttributeType: S
         KeySchema:
-          -
-            AttributeName: id
+          - AttributeName: id
             KeyType: HASH
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          - IndexName: GSI1
+            KeySchema:
+              - AttributeName: machineId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
 
 functions:
   get:
-    handler: src/handler.get
+    handler: src/get.handler
     description: "Upload Now Get method"
     environment:
       BUCKET_NAME: ${self:custom.bucket}
@@ -68,7 +80,7 @@ functions:
           method: post
           cors: true
   upload:
-    handler: src/handler.upload
+    handler: src/upload.handler
     description: "Upload Now Upload method"
     environment:
       BUCKET_NAME: ${self:custom.bucket}
@@ -78,5 +90,16 @@ functions:
     events:
       - http:
           path: upload
+          method: post
+          cors: true
+  list:
+    handler: src/list.handler
+    description: "List all user files"
+    environment:
+      TABLE_NAME: ${self:custom.table}
+      DEBUG: ${self:custom.debug}
+    events:
+      - http:
+          path: list
           method: post
           cors: true

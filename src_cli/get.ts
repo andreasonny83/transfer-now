@@ -71,7 +71,6 @@ export const get = async (name: string, targetDir = '', targetFilename = '', sil
   }
 
   const filename = targetFilename || payload.data.originalFileName;
-
   const destPath = `${filePath}/${filename}${payload.data.fileExtension}`;
 
   if (fs.existsSync(destPath)) {
