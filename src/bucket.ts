@@ -1,4 +1,11 @@
-import { S3Client, GetObjectCommand, GetObjectCommandInput } from '@aws-sdk/client-s3';
+import {
+  S3Client,
+  GetObjectCommand,
+  GetObjectCommandInput,
+  DeleteObjectCommand,
+  DeleteObjectCommandInput,
+  DeleteObjectCommandOutput,
+} from '@aws-sdk/client-s3';
 import { createPresignedPost } from '@aws-sdk/s3-presigned-post';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
@@ -37,4 +44,17 @@ export const getFileUrl = async (bucketName: string, key: string): Promise<strin
   const command = new GetObjectCommand(getObjectParams);
 
   return getSignedUrl(client, command, { expiresIn: 10 });
+};
+
+export const deleteMeta = async (bucketName: string, key: string): Promise<DeleteObjectCommandOutput> => {
+  const client = new S3Client();
+
+  const deleteObjectParams: DeleteObjectCommandInput = {
+    Bucket: bucketName,
+    Key: key,
+  };
+
+  const command = new DeleteObjectCommand(deleteObjectParams);
+
+  return client.send(command);
 };

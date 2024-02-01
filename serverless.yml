@@ -1,5 +1,6 @@
 service: transfer-now
 frameworkVersion: '3'
+configValidationMode: error
 package:
   individually: true
 
@@ -19,6 +20,7 @@ provider:
           Action:
             - 's3:PutObject'
             - 's3:GetObject'
+            - 's3:DeleteObject'
           Resource: "arn:aws:s3:::${self:custom.bucket}/*"
         - Effect: Allow
           Action:
@@ -83,6 +85,8 @@ resources:
             ProvisionedThroughput:
               ReadCapacityUnits: 1
               WriteCapacityUnits: 1
+        StreamSpecification:
+          StreamViewType: NEW_AND_OLD_IMAGES
 
 functions:
   get:
@@ -121,3 +125,19 @@ functions:
           path: list
           method: post
           cors: true
+  ttl:
+    handler: src/ttl.handler
+    description: "TimeToLive event handler from DynamoDB"
+    environment:
+      TABLE_NAME: ${self:custom.table}
+      BUCKET_NAME: ${self:custom.bucket}
+      DEBUG: ${self:custom.debug}
+    events:
+      - stream:
+          type: dynamodb
+          arn:
+            Fn::GetAtt: [TransferNowTable, StreamArn]
+          batchSize: 100
+          startingPosition: LATEST
+          maximumRetryAttempts: 10
+          enabled: true
