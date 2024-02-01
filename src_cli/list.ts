@@ -57,12 +57,17 @@ export const list = async (silent = false): Promise<void> => {
     colWidths: [35, 25, 40],
   });
 
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  spinner.clear();
+
+  if (payload.data.length === 0) {
+    log(false, 'No files found on the server.');
+    return;
+  }
+
   payload.data.forEach((item: any) => {
     table.push([item.id, item.fileName, new Date(item.expiration).toUTCString()]);
   });
-
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  spinner.clear();
 
   log(false, table.toString());
 };

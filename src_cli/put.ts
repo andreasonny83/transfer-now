@@ -25,7 +25,7 @@ export const put = async (targetFile: string, silent = false): Promise<string> =
 
   let getUrlRes;
   try {
-    getUrlRes = await fetch(`${API_URL}/upload`, {
+    getUrlRes = await fetch(`${API_URL}/put`, {
       method: 'POST',
       body: JSON.stringify({
         fileName,

@@ -8,6 +8,7 @@ const enum ACTION {
   PUT = 'put',
   GET = 'get',
   LIST = 'list',
+  LS = 'ls',
   LOGIN = 'login',
 }
 
@@ -53,7 +54,7 @@ export const transfer = async (action: ACTION, name: string, flags: Flags): Prom
     return process.exit(0);
   }
 
-  if (action === ACTION.LIST) {
+  if (action === ACTION.LIST || action === ACTION.LS) {
     await list(silent);
     return process.exit(0);
   }

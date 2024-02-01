@@ -65,7 +65,7 @@ const isDataFresh = (dataItem?: QueryCommandOutput): boolean => {
     return false;
   }
 
-  const now = Date.now();
+  const now = Math.floor(Date.now() / 1000);
   const dataExpiration = data.expiration;
 
   return now < dataExpiration;
@@ -108,8 +108,8 @@ export const storeMeta = async (
   const client = new DynamoDBClient({ region: REGION });
   const docClient = DynamoDBDocumentClient.from(client);
 
-  const requestTime = Date.now();
-  const expirationTime = Date.now() + EXPIRATION_DAYS * 24 * 60 * 60 * 1000;
+  const requestTime = Math.floor(Date.now() / 1000);
+  const expirationTime = requestTime + EXPIRATION_DAYS * 24 * 60 * 60;
 
   const params: PutCommandInput = {
     TableName: tableName,
@@ -152,7 +152,7 @@ export const getMeta = async (tableName: string, name: string) => {
   throw Error('No file found');
 };
 
-export const getUserData = async (tableName: string, machineId: string) => {
+const findMachine = async (tableName: string, machineId: string): Promise<QueryCommandOutput> => {
   const params: QueryCommandInput = {
     TableName: tableName,
     IndexName: 'GSI1',
@@ -166,17 +166,32 @@ export const getUserData = async (tableName: string, machineId: string) => {
   };
 
   const command = new QueryCommand(params);
-  const data = await docClient.send(command);
+  return docClient.send(command);
+};
+
+export const getUserData = async (tableName: string, machineId: string) => {
+  log(`Looking for user ${machineId} in table ${tableName}...`);
+
+  let dataItem;
+  try {
+    dataItem = await findMachine(tableName, machineId);
+    log(dataItem);
+  } catch (err) {
+    log(err);
+  }
+
+  log(`Found items`);
+
+  const now = Math.floor(Date.now() / 1000);
+
   return (
-    data &&
-    data.Items && {
-      data: data.Items.map((item: any) => {
-        return {
-          id: item.id,
-          expiration: item.expiration,
-          fileName: item.data.originalFileName + item.data.fileExtension,
-        };
-      }),
+    dataItem &&
+    dataItem.Items && {
+      data: dataItem.Items.map((item) => ({
+        id: item.id,
+        expiration: item.expiration,
+        fileName: item.data.originalFileName + item.data.fileExtension,
+      })).filter((item) => item.expiration > now),
     }
   );
 };
