@@ -1,6 +1,6 @@
 {
   "name": "transfer-now",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Share your files with people using just the terminal",
   "bin": {
     "transfer-now": "bin/cli.js"
