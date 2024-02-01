@@ -66,7 +66,7 @@ export const list = async (silent = false): Promise<void> => {
   }
 
   payload.data.forEach((item: any) => {
-    table.push([item.id, item.fileName, new Date(item.expiration).toUTCString()]);
+    table.push([item.id, item.fileName, new Date(item.expiration * 1000).toUTCString()]);
   });
 
   log(false, table.toString());
