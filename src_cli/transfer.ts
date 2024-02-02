@@ -2,6 +2,7 @@ import { put } from './put';
 import { log } from './log';
 import { get } from './get';
 import { list } from './list';
+import { link } from './link';
 import { GENERIC_ERROR } from './constants';
 
 const enum ACTION {
@@ -9,7 +10,7 @@ const enum ACTION {
   GET = 'get',
   LIST = 'list',
   LS = 'ls',
-  LOGIN = 'login',
+  LINK = 'link',
 }
 
 type Flags = {
@@ -55,13 +56,37 @@ export const transfer = async (action: ACTION, name: string, flags: Flags): Prom
   }
 
   if (action === ACTION.LIST || action === ACTION.LS) {
-    await list(silent);
+    let listFiles;
+    try {
+      listFiles = await list(silent);
+    } catch (err: any) {
+      log(silent, (err && err.message) || GENERIC_ERROR);
+      process.exit(1);
+    }
+
+    if (!listFiles) {
+      log(silent, GENERIC_ERROR);
+    }
+
+    log(silent, listFiles);
     return process.exit(0);
   }
 
-  if (action === ACTION.LOGIN) {
-    log(silent, 'Method "get" not yet available. Try again in the future');
-    return process.exit(0);
+  if (action === ACTION.LINK) {
+    let linkUrl: string;
+    try {
+      linkUrl = await link(name, silent);
+    } catch (err: any) {
+      log(silent, (err && err.message) || GENERIC_ERROR);
+      process.exit(1);
+    }
+
+    if (!linkUrl) {
+      log(silent, GENERIC_ERROR);
+    }
+
+    log(silent, `One-ime URL genereated:\n\n  ${linkUrl}\n`);
+    process.exit(0);
   }
 
   log(silent, `Method not allowed ${action}. Try running transfer-now --help for more information`);

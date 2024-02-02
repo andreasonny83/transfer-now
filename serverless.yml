@@ -12,7 +12,7 @@ provider:
   name: aws
   runtime: nodejs18.x
   stage: ${opt:stage, 'dev'}
-  timeout: 20
+  timeout: 10
   iam:
     role:
       statements:
@@ -125,6 +125,18 @@ functions:
           path: list
           method: post
           cors: true
+  link:
+    handler: src/link.handler
+    description: "Generate short link to download files with Transfer Now"
+    environment:
+      TABLE_NAME: ${self:custom.table}
+      BUCKET_NAME: ${self:custom.bucket}
+      DEBUG: ${self:custom.debug}
+    events:
+      - http:
+          path: link
+          method: post
+          cors: true
   ttl:
     handler: src/ttl.handler
     description: "TimeToLive event handler from DynamoDB"
@@ -141,3 +153,15 @@ functions:
           startingPosition: LATEST
           maximumRetryAttempts: 10
           enabled: true
+  downloadFile:
+    handler: src/downloadFile.handler
+    description: "URL to download files from Transfer Now"
+    environment:
+      TABLE_NAME: ${self:custom.table}
+      BUCKET_NAME: ${self:custom.bucket}
+      DEBUG: ${self:custom.debug}
+    events:
+      - http:
+          path: downloadFile
+          method: get
+          cors: true

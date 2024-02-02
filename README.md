@@ -27,6 +27,7 @@ Share your files with people using just the terminal
     put <input>           Upload a file. Example: transfer-now put ./README.md
     get <unique_name>     Download a file. Example: transfer-now get daily_tomato_orangutan
     list                  List all the files uploaded by you. Example: transfer-now list
+    link <unique_name>    Generate a one-time download link for a file. Example: transfer-now link daily_tomato_orangutan
 
   Short Commands
     ls                    Short for 'list'. Example: transfer-now ls

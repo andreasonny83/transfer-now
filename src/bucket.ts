@@ -33,7 +33,7 @@ export const generatePresignedUrl = async (bucketName: string, key: string, cont
   });
 };
 
-export const getFileUrl = async (bucketName: string, key: string): Promise<string> => {
+export const getFileUrl = async (bucketName: string, key: string, expiration = 10): Promise<string> => {
   const client = new S3Client();
 
   const getObjectParams: GetObjectCommandInput = {
@@ -43,7 +43,7 @@ export const getFileUrl = async (bucketName: string, key: string): Promise<strin
 
   const command = new GetObjectCommand(getObjectParams);
 
-  return getSignedUrl(client, command, { expiresIn: 10 });
+  return getSignedUrl(client, command, { expiresIn: expiration });
 };
 
 export const deleteMeta = async (bucketName: string, key: string): Promise<DeleteObjectCommandOutput> => {

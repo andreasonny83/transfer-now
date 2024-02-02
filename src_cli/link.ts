@@ -1,11 +1,8 @@
-import { machineIdSync } from 'node-machine-id';
 import fetch from 'node-fetch';
 import { API_URL, GENERIC_ERROR } from './constants';
 import ora from 'ora';
-import Table from 'cli-table';
 
-export const list = async (silent = false): Promise<string> => {
-  const machineId = machineIdSync();
+export const link = async (shortName: string, silent = false): Promise<string> => {
   const spinner = ora('Looking for your files...');
 
   if (!silent) {
@@ -14,9 +11,9 @@ export const list = async (silent = false): Promise<string> => {
 
   let getListRes;
   try {
-    getListRes = await fetch(`${API_URL}/list`, {
+    getListRes = await fetch(`${API_URL}/link`, {
       method: 'POST',
-      body: JSON.stringify({ machineId }),
+      body: JSON.stringify({ shortName }),
     });
   } catch (err) {
     spinner.clear();
@@ -40,31 +37,18 @@ export const list = async (silent = false): Promise<string> => {
     payload = await getListRes.json();
   } catch (err) {
     spinner.clear();
-    throw Error('Cannot reach the service. Please try again later');
+    throw Error('Cannot reach the service. Please try again later.');
   }
 
-  if (!payload || !payload.data) {
+  if (!payload || !payload?.fileUrl) {
     spinner.clear();
     throw Error(GENERIC_ERROR);
   }
 
-  spinner.text = 'User found. Retrieving transfers data...';
-
-  const table = new Table({
-    head: ['id', 'fileName', 'expiration date'],
-    colWidths: [35, 25, 40],
-  });
+  spinner.text = 'File found. Generating unique link...';
 
   await new Promise((resolve) => setTimeout(resolve, 1000));
   spinner.clear();
 
-  if (payload.data.length === 0) {
-    throw Error('No files found on the server.');
-  }
-
-  payload.data.forEach((item: any) => {
-    table.push([item.id, item.fileName, new Date(item.expiration * 1000).toUTCString()]);
-  });
-
-  return table.toString();
+  return `${API_URL}/downloadFile?hash=${payload.fileUrl}`;
 };
