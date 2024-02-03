@@ -5,12 +5,12 @@ const TABLE_NAME = process.env.TABLE_NAME || '';
 
 export const handler = async (event: any): Promise<any> => {
   const { body } = event;
-  const { shortName } = JSON.parse(body);
+  const { shortName, machineId } = JSON.parse(body);
 
-  if (!shortName) {
+  if (!shortName || !machineId) {
     return {
       statusCode: 400,
-      body: `Please provide a valid shortName`,
+      body: `Please provide a valid shortName and machineId.`,
     };
   }
 
@@ -22,6 +22,13 @@ export const handler = async (event: any): Promise<any> => {
     return {
       statusCode: 400,
       body: `No data found matching the name "${shortName}"\nPlease, check the information then try again`,
+    };
+  }
+
+  if (itemData.machineId !== machineId) {
+    return {
+      statusCode: 404,
+      body: `File not found. Please, check the information then try again.`,
     };
   }
 
