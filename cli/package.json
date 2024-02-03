@@ -20,7 +20,7 @@
     "cli": "npm run build && API_URL=http://localhost:3000/dev node ./bin/cli",
     "cli:prod": "npm run build && node ./bin/cli",
     "prebuild": "./node_modules/.bin/eslint --ext .js,.ts src",
-    "lint": "./node_modules/.bin/eslint --ext .js,.ts src --fix"
+    "test": "./node_modules/.bin/eslint --ext .js,.ts src --fix"
   },
   "dependencies": {
     "cli-table": "^0.3.11",
