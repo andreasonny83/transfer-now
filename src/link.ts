@@ -10,7 +10,7 @@ export const handler = async (event: any): Promise<any> => {
   if (!shortName || !machineId) {
     return {
       statusCode: 400,
-      body: `Please provide a valid shortName and machineId.`,
+      body: `Missing required information. Please, try again later.`,
     };
   }
 

@@ -1,9 +1,11 @@
 import fetch from 'node-fetch';
+import { machineIdSync } from 'node-machine-id';
 import { API_URL, GENERIC_ERROR } from './constants';
 import ora from 'ora';
 
 export const link = async (shortName: string, silent = false): Promise<string> => {
   const spinner = ora('Looking for your files...');
+  const machineId = machineIdSync();
 
   if (!silent) {
     spinner.start();
@@ -13,7 +15,7 @@ export const link = async (shortName: string, silent = false): Promise<string> =
   try {
     getListRes = await fetch(`${API_URL}/link`, {
       method: 'POST',
-      body: JSON.stringify({ shortName }),
+      body: JSON.stringify({ shortName, machineId }),
     });
   } catch (err) {
     spinner.clear();
