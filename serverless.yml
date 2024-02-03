@@ -3,6 +3,8 @@ frameworkVersion: '3'
 configValidationMode: error
 package:
   individually: true
+  patterns:
+    - '!cli/**'
 
 plugins:
   - serverless-offline
@@ -26,6 +28,7 @@ provider:
           Action:
             - 'dynamodb:Query'
             - 'dynamodb:PutItem'
+            - 'dynamodb:DeleteItem'
           Resource:
             - 'Fn::Join':
               - ':'

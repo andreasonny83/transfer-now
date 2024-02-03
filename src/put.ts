@@ -7,7 +7,7 @@ const TABLE_NAME = process.env.TABLE_NAME || '';
 
 export const handler = async (event: any): Promise<any> => {
   const { body } = event;
-  const { fileName, extName, mimeType, machineId } = JSON.parse(body);
+  const { fileName, extName, mimeType, machineId, fileSize } = JSON.parse(body);
 
   log('body', body);
 
@@ -35,12 +35,12 @@ export const handler = async (event: any): Promise<any> => {
 
   let info;
   try {
-    info = await generatePresignedUrl(BUCKET_NAME, rndName, mimeType);
+    info = await generatePresignedUrl(BUCKET_NAME, rndName, mimeType, fileSize);
   } catch (err: any) {
     log(err.message || err);
     return {
       statusCode: 400,
-      body: 'No files were uploaded. Please, try again later',
+      body: err.message || 'No files were uploaded. Please, try again later',
     };
   }
 

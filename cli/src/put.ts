@@ -13,6 +13,7 @@ export const put = async (targetFile: string, silent = false): Promise<string> =
   const fileName = path.basename(filePath).replace(extName, '');
   const mimeType = getType(extName);
   const machineId = machineIdSync();
+  const fileSize = fs.statSync(filePath).size;
 
   if (!mimeType || !extName || !fileName || !filePath) {
     throw Error('The provided file is not supported. A file must have a name and a valid extension');
@@ -32,6 +33,7 @@ export const put = async (targetFile: string, silent = false): Promise<string> =
         extName,
         mimeType,
         machineId,
+        fileSize,
       }),
     });
   } catch (err) {

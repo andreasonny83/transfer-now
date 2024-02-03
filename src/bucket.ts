@@ -11,10 +11,14 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 const MAX_FILE_SIZE = Number(process.env.MAX_FILE_SIZE_MB) || 10;
 
-export const generatePresignedUrl = async (bucketName: string, key: string, contentType: string) => {
+export const generatePresignedUrl = async (bucketName: string, key: string, contentType: string, fileSize: number) => {
   const client = new S3Client();
-
   const maxFileSize = MAX_FILE_SIZE * 1000 * 1000;
+
+  if (fileSize > maxFileSize) {
+    const fileSizeInMb = (fileSize / 1000000).toFixed(2);
+    throw Error(`The file size is too big. The maximum file size is ${MAX_FILE_SIZE}MB. File size: ${fileSizeInMb}MB`);
+  }
 
   return createPresignedPost(client, {
     Bucket: bucketName,
@@ -33,7 +37,7 @@ export const generatePresignedUrl = async (bucketName: string, key: string, cont
   });
 };
 
-export const getFileUrl = async (bucketName: string, key: string, expiration = 10): Promise<string> => {
+export const getFileUrl = async (bucketName: string, key: string, expiration = 2): Promise<string> => {
   const client = new S3Client();
 
   const getObjectParams: GetObjectCommandInput = {
