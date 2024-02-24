@@ -73,9 +73,10 @@ export const put = async (targetFile: string, silent = false): Promise<string> =
     form.append(field, payload.fields[field]);
   }
 
-  form.append('file', fs.createReadStream(filePath));
+  const stream = fs.createReadStream(filePath);
+  form.append('file', stream);
 
-  spinner.text = 'Server ready. Uploading the file...';
+  spinner.text = 'Server ready. Preparing for the upload...';
 
   let length: number;
   try {
@@ -101,25 +102,33 @@ export const put = async (targetFile: string, silent = false): Promise<string> =
     );
   }
 
+  const fileUploadLoop = setInterval(() => {
+    const fileUploadingStatus = ((stream.bytesRead * 100) / length).toFixed(2);
+    spinner.text = `Uploading file... ${fileUploadingStatus}%`;
+  }, 500);
+
   let response;
   try {
     response = await fetch(payload.url, {
       method: 'POST',
       body: form,
+
       headers: {
         'Content-Length': String(length),
       },
     });
   } catch (err: any) {
+    clearInterval(fileUploadLoop);
     spinner.stop();
     throw Error(err.message || GENERIC_ERROR);
   }
 
+  clearInterval(fileUploadLoop);
+  spinner.stop();
+
   if (!response || !response.ok || response.status >= 300) {
-    spinner.stop();
     throw Error('Cannot upload the file. Please, try again later.');
   }
 
-  spinner.stop();
   return fileEndpoint;
 };
