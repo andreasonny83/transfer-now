@@ -37,12 +37,18 @@ export const generatePresignedUrl = async (bucketName: string, key: string, cont
   });
 };
 
-export const getFileUrl = async (bucketName: string, key: string, expiration = 2): Promise<string> => {
+export const getFileUrl = async (
+  bucketName: string,
+  key: string,
+  expiration = 2,
+  fileName?: string
+): Promise<string> => {
   const client = new S3Client();
 
   const getObjectParams: GetObjectCommandInput = {
     Bucket: bucketName,
     Key: key,
+    ...(fileName && { ResponseContentDisposition: `attachment; filename="${fileName}"` }),
   };
 
   const command = new GetObjectCommand(getObjectParams);
