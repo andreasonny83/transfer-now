@@ -62,7 +62,7 @@ export const handler = async (event: any): Promise<any> => {
   let downloadUrl;
   try {
     const fileName = fileMeta.data.originalFileName + '.' + fileMeta.data.fileExtension;
-    downloadUrl = await getFileUrl(BUCKET_NAME, uniqueName, 60, fileName);
+    downloadUrl = await getFileUrl(BUCKET_NAME, uniqueName, 3, fileName);
   } catch (err) {
     log(err);
   }

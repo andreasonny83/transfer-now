@@ -40,7 +40,7 @@ export const generatePresignedUrl = async (bucketName: string, key: string, cont
 export const getFileUrl = async (
   bucketName: string,
   key: string,
-  expiration = 2,
+  expiration = 3,
   fileName?: string
 ): Promise<string> => {
   const client = new S3Client();
